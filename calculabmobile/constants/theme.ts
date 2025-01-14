@@ -13,11 +13,18 @@ export const COLORS = {
   gray: '#D1D5DB',
   lightGray: '#E5E7EB',
   error: '#EF4444',
+  black: '#000000',
+  sidebar: '#D8D8F6',
+  sidebarAccent: '#00D95F',
+  gold: '#E7C464',
+  silver: '#C5C5C5',
+  bronze: '#EACAAC',
 };
 
 export const FONTS = {
   regular: 'Inter-Regular',
   medium: 'Inter-Medium',
+  semiBold: 'Inter-SemiBold',
   bold: 'Inter-Bold',
 };
 
@@ -28,6 +35,10 @@ export const SIZES = {
   medium: 16,
   large: 18,
   extraLarge: 24,
+  padding: 16,
+  radius: 8,
+  iconSize: 24,
+  avatarSize: 80,
 };
 
 export const SHADOWS = {
@@ -63,7 +74,7 @@ export const SHADOWS = {
   },
 };
 
-export const SIZES = {
+export const DEVICE_SIZES = {
   width,
   height,
 };

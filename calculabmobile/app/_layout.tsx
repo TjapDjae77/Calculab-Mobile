@@ -5,7 +5,10 @@ import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
+// Add error boundary
+export { ErrorBoundary } from 'expo-router';
+
+export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
@@ -19,13 +22,5 @@ export default function Layout() {
 
   if (!fontsLoaded) return null;
 
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
-      }}
-    />
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
-

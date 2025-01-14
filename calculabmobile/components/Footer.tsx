@@ -1,23 +1,23 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { COLORS } from '../constants/theme';
 
 const Footer = () => {
-  const navigation = useNavigation();
+  const router = useRouter();
 
   return (
     <View style={styles.footer}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+      <TouchableOpacity onPress={() => router.push('/')}>
         <Image source={require('../assets/images/home_icon.png')} style={styles.icon} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Roadmap')}>
+      <TouchableOpacity onPress={() => router.push('/roadmap')}>
         <Image source={require('../assets/images/roadmap_icon.png')} style={styles.icon} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')}>
+      <TouchableOpacity onPress={() => router.push('/leaderboard')}>
         <Image source={require('../assets/images/leaderboard_icon.png')} style={styles.icon} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+      <TouchableOpacity onPress={() => router.push('/profile')}>
         <Image source={require('../assets/images/profile_icon.png')} style={styles.icon} />
       </TouchableOpacity>
     </View>
@@ -41,4 +41,3 @@ const styles = StyleSheet.create({
 });
 
 export default Footer;
-

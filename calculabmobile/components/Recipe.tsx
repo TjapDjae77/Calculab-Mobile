@@ -7,7 +7,7 @@ const Recipe: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Recipe</Text>
       <Image
-        source={require('../assets/images/Rocket Recipe.png')}
+        source={require('../assets/images/Rocket_Recipe.png')}
         style={styles.recipeImage}
         resizeMode="contain"
       />

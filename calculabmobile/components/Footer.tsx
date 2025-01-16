@@ -8,9 +8,9 @@ const Footer = () => {
 
   return (
     <View style={styles.footer}>
-      {/* <TouchableOpacity onPress={() => router.push('/')}>
+      {<TouchableOpacity onPress={() => router.push('/')}>
         <Image source={require('../assets/images/home_icon.png')} style={styles.icon} />
-      </TouchableOpacity> */}
+      </TouchableOpacity>}
       <TouchableOpacity onPress={() => router.push('/roadmap')}>
         <Image source={require('../assets/images/roadmap_icon.png')} style={styles.icon} />
       </TouchableOpacity>

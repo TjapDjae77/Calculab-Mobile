@@ -13,6 +13,8 @@ export default function RootLayout() {
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
   });
 
+  if (!fontsLoaded) return null;
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();

@@ -3,13 +3,15 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useRouter } from 'expo-router';
 
-const Profile = () => {
+export default function Profile() {
   const [username, setUsername] = useState('-');
   const [email, setEmail] = useState('-');
   const [levelsCompleted, setLevelsCompleted] = useState('-');
   const [totalScore, setTotalScore] = useState('-');
   const navigation = useNavigation();
+  const router = useRouter();
 
   useEffect(() => {
     // Fetch user data here
@@ -25,22 +27,26 @@ const Profile = () => {
     console.log('Logout attempted');
   };
 
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
+
   return (
     <LinearGradient
       colors={[COLORS.primary, COLORS.secondary, COLORS.tertiary]}
       style={styles.container}
     >
       <View style={styles.sidebar}>
-        <TouchableOpacity onPress={() => navigation.navigate('Roadmap')} style={styles.logoContainer}>
+        <TouchableOpacity onPress={() => handleNavigation('/roadmap')} style={styles.logoContainer}>
           <Image source={require('../assets/images/Logo_Calculab.svg')} style={styles.logo} />
           <Text style={styles.logoText}>Calculab</Text>
         </TouchableOpacity>
         <View style={styles.nav}>
-          <TouchableOpacity onPress={() => navigation.navigate('Roadmap')} style={styles.navItem}>
+          <TouchableOpacity onPress={() => handleNavigation('/roadmap')} style={styles.navItem}>
             <Image source={require('../assets/images/bookmark.svg')} style={styles.navIcon} />
             <Text style={styles.navText}>Learn</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Leaderboard')} style={styles.navItem}>
+          <TouchableOpacity onPress={() => handleNavigation('/leaderboard')} style={styles.navItem}>
             <Image source={require('../assets/images/medal.svg')} style={styles.navIcon} />
             <Text style={styles.navText}>Leaderboard</Text>
           </TouchableOpacity>
@@ -239,6 +245,3 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
   },
 });
-
-export default Profile;
-

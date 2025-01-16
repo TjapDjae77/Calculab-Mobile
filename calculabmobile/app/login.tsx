@@ -3,16 +3,22 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView 
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useRouter } from 'expo-router';
 
-const Login = () => {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  const router = useRouter();
 
   const handleLogin = () => {
     // Implement login logic here
     console.log('Login attempted');
+  };
+
+  const handleRegister = () => {
+    router.push('/register');
   };
 
   return (
@@ -73,7 +79,7 @@ const Login = () => {
         </TouchableOpacity>
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity onPress={handleRegister}>
             <Text style={styles.signupLink}>Sign up</Text>
           </TouchableOpacity>
         </View>
@@ -236,4 +242,3 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
-

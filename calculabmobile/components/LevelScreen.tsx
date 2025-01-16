@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import Header from './Header';
 import ProgressBar from './ProgressBar';
 import MaterialInput from './MaterialInput';
@@ -27,14 +27,10 @@ const LevelScreen: React.FC<LevelScreenProps> = ({ levelNumber, levelTitle }) =>
   const [showGoBackPopup, setShowGoBackPopup] = useState(false);
   const [score, setScore] = useState(0);
 
-  const navigation = useNavigation();
+  const router = useRouter();
 
   const handleGoBack = () => {
-    setShowGoBackPopup(true);
-  };
-
-  const handleConfirmGoBack = () => {
-    navigation.goBack();
+    router.back();
   };
 
   return (
@@ -102,4 +98,3 @@ const styles = StyleSheet.create({
 });
 
 export default LevelScreen;
-

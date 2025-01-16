@@ -3,8 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView 
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, FONTS, SIZES } from '../constants/theme';
+import { useRouter } from 'expo-router';
 
-const Register = () => {
+export default function Register() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,6 +14,7 @@ const Register = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
+  const router = useRouter();
 
   const handleRegister = () => {
     // Implement registration logic here
@@ -23,6 +25,10 @@ const Register = () => {
       // Clear error message if successful
       setErrorMessage('');
     }
+  };
+
+  const handleLogin = () => {
+    router.push('/login');
   };
 
   return (
@@ -108,7 +114,7 @@ const Register = () => {
         </TouchableOpacity>
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={handleLogin}>
             <Text style={styles.loginLink}>Log in</Text>
           </TouchableOpacity>
         </View>
@@ -267,6 +273,3 @@ const styles = StyleSheet.create({
     fontSize: SIZES.font,
   },
 });
-
-export default Register;
-

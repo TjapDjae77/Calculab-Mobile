@@ -3,20 +3,22 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { COLORS, FONTS } from '../constants/theme';
 
 interface HeaderProps {
-  title: string;
-  onBackPress: () => void;
+  levelTitle: string;
+  lives: number;
+  onGoBack: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, onBackPress }) => {
+const Header: React.FC<HeaderProps> = ({ levelTitle, lives, onGoBack }) => {
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={onBackPress} style={styles.backButton}>
+      <TouchableOpacity onPress={onGoBack} style={styles.backButton}>
         <Image
           source={require('../assets/images/Go_Back.svg')}
           style={styles.backIcon}
         />
       </TouchableOpacity>
-      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.title}>{levelTitle}</Text>
+      <Text style={styles.lives}>{`Lives: ${lives}`}</Text>
       <TouchableOpacity style={styles.profileButton}>
         <Image
           source={require('../assets/images/User_Icon.png')}
@@ -48,6 +50,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     color: COLORS.text,
   },
+  lives: {
+    fontSize: 16,
+    fontFamily: FONTS.regular,
+    color: COLORS.text,
+  },
   profileButton: {
     padding: 5,
   },
@@ -59,4 +66,3 @@ const styles = StyleSheet.create({
 });
 
 export default Header;
-

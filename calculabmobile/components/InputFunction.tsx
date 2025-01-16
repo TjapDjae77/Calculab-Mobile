@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { COLORS, FONTS } from '../constants/theme';
 
-const InputFunction: React.FC = () => {
-  const [function, setFunction] = useState('');
+export default function InputFunction() {
+  const [inputValue, setInputValue] = useState('');
+  const [result, setResult] = useState('');
 
   return (
     <View style={styles.container}>
@@ -12,8 +13,8 @@ const InputFunction: React.FC = () => {
         <Text style={styles.label}>g(x) =</Text>
         <TextInput
           style={styles.input}
-          value={function}
-          onChangeText={setFunction}
+          value={inputValue}
+          onChangeText={setInputValue}
           placeholder="Enter function"
           placeholderTextColor={COLORS.textLight}
         />
@@ -59,6 +60,3 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
 });
-
-export default InputFunction;
-

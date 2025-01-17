@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,66 +6,104 @@ import {
   StyleSheet,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
 export default function Profile() {
+  const [profile, setProfile] = useState({
+    username: "-",
+    email: "-",
+    score: "-",
+    completedLevels: "-",
+  });
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const handleLogout = () => {
+  // Fungsi untuk memeriksa dan memastikan token valid
+  const ensureValidAccessToken = async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      Alert.alert("Error", "Session expired. Please log in again.");
+      router.push("/login");
+      return null;
+    }
+    return token;
+  };
+
+  // Fungsi untuk mengambil data profil
+  const fetchProfile = async () => {
+    setLoading(true);
+    try {
+      const token = await ensureValidAccessToken();
+      if (!token) return;
+
+      const response = await fetch(
+        "https://calculab-backend.up.railway.app/api/accounts/profile/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 401) {
+        // Token kadaluarsa, arahkan ke halaman login
+        Alert.alert("Error", "Session expired. Please log in again.");
+        router.push("/login");
+        return;
+      }
+
+      const data = await response.json();
+      if (response.ok) {
+        setProfile({
+          username: data.username || "-",
+          email: data.email || "-",
+          score: data.score || "0",
+          completedLevels: data.completed_levels?.length || "0",
+        });
+      } else {
+        Alert.alert("Error", "Failed to load profile data.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fungsi logout
+  const handleLogout = async () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: () => router.push("../login") },
+      {
+        text: "Logout",
+        onPress: async () => {
+          await AsyncStorage.removeItem("token");
+          await AsyncStorage.removeItem("refresh_token");
+          router.push("/login");
+        },
+      },
     ]);
   };
 
+  // Ambil data profil saat halaman dimuat
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
   return (
     <View style={styles.container}>
-      {/* Sidebar */}
-      {/* <View style={styles.sidebar}>
-        <Image
-          source={require("../../assets/images/Logo_Calculab.png")}
-          style={styles.logo}
-        />
-        <Text style={styles.appTitle}>Calculab</Text>
-        <View style={styles.navItems}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => router.push("/(tabs)/explore")}
-          >
-            <Image
-              source={require("../../assets/images/bookmark.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Learn</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => router.push("/(tabs)/leaderboard")}
-          >
-            <Image
-              source={require("../../assets/images/medal.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Leaderboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-            <Image
-              source={require("../../assets/images/profile.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-      </View> */}
-
       {/* Main Content */}
-      <View style={styles.mainContent}>
+      {/* <View style={styles.mainContent}>
         <View style={styles.profileCard}>
-          <Text style={styles.title}>Profile</Text>
+          <Text style={styles.title}>Profile</Text> */}
 
           {/* Profile Info */}
-          <View style={styles.profileInfo}>
+          {/* <View style={styles.profileInfo}>
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>A</Text>
             </View>
@@ -75,6 +113,55 @@ export default function Profile() {
               </Text>
               <Text style={styles.infoText}>
                 Email: <Text style={styles.boldText}>-</Text>
+              </Text>
+            </View>
+          </View> */}
+
+          {/* Edit Profile Button */}
+          {/* <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity> */}
+
+          {/* Statistics */}
+          {/* <View style={styles.statsContainer}>
+            <Text style={styles.statsTitle}>Your Statistics</Text>
+            <View style={styles.stats}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>-</Text>
+                <Text style={styles.statLabel}>Levels Completed</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>-</Text>
+                <Text style={styles.statLabel}>Total Score</Text>
+              </View>
+            </View>
+          </View> */}
+
+          {/* Logout Button */}
+          {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </View> */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#6D2476" />
+      ) : (
+        <View style={styles.profileCard}>
+          <Text style={styles.title}>Profile</Text>
+
+          {/* Profile Info */}
+          <View style={styles.profileInfo}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                {profile.username.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+            <View style={styles.userInfo}>
+              <Text style={styles.infoText}>
+                Username: <Text style={styles.boldText}>{profile.username}</Text>
+              </Text>
+              <Text style={styles.infoText}>
+                Email: <Text style={styles.boldText}>{profile.email}</Text>
               </Text>
             </View>
           </View>
@@ -89,11 +176,13 @@ export default function Profile() {
             <Text style={styles.statsTitle}>Your Statistics</Text>
             <View style={styles.stats}>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>-</Text>
+                <Text style={styles.statNumber}>
+                  {profile.completedLevels}
+                </Text>
                 <Text style={styles.statLabel}>Levels Completed</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statNumber}>-</Text>
+                <Text style={styles.statNumber}>{profile.score}</Text>
                 <Text style={styles.statLabel}>Total Score</Text>
               </View>
             </View>
@@ -104,13 +193,13 @@ export default function Profile() {
             <Text style={styles.logoutButtonText}>Logout</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: "row", backgroundColor: "#E2E8F0" },
+  container: { flex: 1, flexDirection: "row", backgroundColor: "#E2E8F0", alignItems: "center", justifyContent: "center" },
   sidebar: {
     width: "25%",
     backgroundColor: "#6D2476",

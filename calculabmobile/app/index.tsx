@@ -11,7 +11,6 @@ import {
   Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { ensureValidAccessToken, refreshAccessToken } from "../scripts/auth";
 
 const { height } = Dimensions.get("window");
 
@@ -118,7 +117,11 @@ export default function Register() {
               onPress={() => setPasswordVisible(!passwordVisible)}
             >
               <Image
-                source={require("../assets/images/Hide.png")}
+                source={
+                  passwordVisible
+                    ? require("../assets/images/See.png")
+                    : require("../assets/images/Hide.png")
+                }
                 style={styles.passwordIcon}
               />
             </TouchableOpacity>
@@ -143,7 +146,11 @@ export default function Register() {
               }
             >
               <Image
-                source={require("../assets/images/Hide.png")}
+                source={
+                  confirmPasswordVisible
+                    ? require("../assets/images/See.png")
+                    : require("../assets/images/Hide.png")
+                }
                 style={styles.passwordIcon}
               />
             </TouchableOpacity>

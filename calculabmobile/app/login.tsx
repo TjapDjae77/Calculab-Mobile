@@ -57,7 +57,6 @@ export default function Login() {
           Alert.alert("Error", "Missing tokens in response. Please try again.");
         }
       } else if (data.status === "error" && data.errors) {
-        // Menggabungkan pesan error menjadi satu string
         const errorMessages = Object.values(data.errors)
           .flat()
           .join(" ");
@@ -116,7 +115,11 @@ export default function Login() {
               onPress={() => setPasswordVisible(!passwordVisible)}
             >
               <Image
-                source={require("../assets/images/Hide.png")}
+                source={
+                  passwordVisible
+                    ? require("../assets/images/See.png")
+                    : require("../assets/images/Hide.png")
+                }
                 style={styles.passwordIcon}
               />
             </TouchableOpacity>

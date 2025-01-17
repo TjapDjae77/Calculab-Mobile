@@ -12,11 +12,12 @@ import {
 import { useRouter } from "expo-router";
 
 export default function Level1() {
-  const router = useRouter(); // Using router from expo-router
+  const router = useRouter();
   const [inputFunction, setInputFunction] = useState("");
   const [progress, setProgress] = useState(0);
   const [lives, setLives] = useState(3);
   const [outputImage, setOutputImage] = useState(null);
+  const [selectedMaterial, setSelectedMaterial] = useState(null); // Track selected material
 
   const handlePlay = () => {
     if (inputFunction.trim() === "") {
@@ -43,7 +44,7 @@ export default function Level1() {
       "Your progress will be lost if you leave the game. Are you sure?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Leave", onPress: () => router.push("/explore") }, // Use router for navigation
+        { text: "Leave", onPress: () => router.push("/explore") },
       ]
     );
   };
@@ -83,7 +84,14 @@ export default function Level1() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Material Input</Text>
           <View style={styles.dropArea}>
-            <Text style={styles.dropText}>Drop the material here</Text>
+            {selectedMaterial ? (
+              <Image
+                source={selectedMaterial}
+                style={styles.materialPreview}
+              />
+            ) : (
+              <Text style={styles.dropText}>Drop the material here</Text>
+            )}
           </View>
         </View>
 
@@ -109,7 +117,9 @@ export default function Level1() {
             {outputImage ? (
               <Image source={outputImage} style={styles.outputImage} />
             ) : (
-              <Text style={styles.outputPlaceholder}>Output will appear here</Text>
+              <Text style={styles.outputPlaceholder}>
+                Output will appear here
+              </Text>
             )}
           </View>
         </View>
@@ -121,22 +131,46 @@ export default function Level1() {
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>List Materials</Text>
           <View style={styles.materialList}>
-            <Image
-              source={require("../assets/images/aluminium.png")}
-              style={styles.material}
-            />
-            <Image
-              source={require("../assets/images/fiberglass.png")}
-              style={styles.material}
-            />
-            <Image
-              source={require("../assets/images/anvil.png")}
-              style={styles.material}
-            />
-            <Image
-              source={require("../assets/images/glass.png")}
-              style={styles.material}
-            />
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedMaterial(require("../assets/images/aluminium.png"))
+              }
+            >
+              <Image
+                source={require("../assets/images/aluminium.png")}
+                style={styles.material}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedMaterial(require("../assets/images/fiberglass.png"))
+              }
+            >
+              <Image
+                source={require("../assets/images/fiberglass.png")}
+                style={styles.material}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedMaterial(require("../assets/images/anvil.png"))
+              }
+            >
+              <Image
+                source={require("../assets/images/anvil.png")}
+                style={styles.material}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedMaterial(require("../assets/images/glass.png"))
+              }
+            >
+              <Image
+                source={require("../assets/images/glass.png")}
+                style={styles.material}
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -168,159 +202,188 @@ export default function Level1() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#d8d8f6",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  backIcon: {
-    width: 40,
-    height: 40,
-  },
-  levelTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    flex: 1,
-    textAlign: "center",
-  },
-  livesContainer: {
-    flexDirection: "row",
-  },
-  lifeIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 5,
-  },
-  progressBarContainer: {
-    width: "80%",
-    alignSelf: "center",
-    marginBottom: 20,
-  },
-  progressBar: {
-    height: 10,
-    backgroundColor: "#ccc",
-    borderRadius: 5,
-  },
-  progress: {
-    height: "100%",
-    backgroundColor: "#1CB5E0",
-    borderRadius: 5,
-  },
-  mainContent: {
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  dropArea: {
-    height: 100,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dropText: {
-    color: "#777",
-    fontSize: 16,
-  },
-  functionMachine: {
-    height: 150,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  functionQuestion: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  playButton: {
-    alignSelf: "center",
-    backgroundColor: "#ccc",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  playActive: {
-    backgroundColor: "#1CB5E0",
-  },
-  playButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  outputContainer: {
-    height: 100,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  outputImage: {
-    width: 80,
-    height: 80,
-  },
-  outputPlaceholder: {
-    color: "#777",
-  },
-  footer: {
-    flexDirection: "column",
-    marginTop: 20,
-  },
-  footerSection: {
-    marginBottom: 20,
-  },
-  footerTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  materialList: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-  },
-  material: {
-    width: 60,
-    height: 60,
-  },
-  functionInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  baseFunction: {
-    fontSize: 18,
-    color: "#fff",
-    marginRight: 10,
-  },
-  functionInput: {
-    flex: 1,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-  },
-  recipeImage: {
-    width: "100%",
-    height: 120,
-    resizeMode: "contain",
-  },
-});
+    container: {
+      flexGrow: 1,
+      backgroundColor: "#d8d8f6",
+      paddingVertical: 20,
+      paddingHorizontal: 10,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 10,
+      marginBottom: 20,
+    },
+    backIcon: {
+      width: 40,
+      height: 40,
+    },
+    levelTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      color: "#000",
+      flex: 1,
+      textAlign: "center",
+    },
+    livesContainer: {
+      flexDirection: "row",
+    },
+    lifeIcon: {
+      width: 30,
+      height: 30,
+      marginLeft: 5,
+    },
+    progressBarContainer: {
+      width: "90%",
+      alignSelf: "center",
+      marginBottom: 20,
+    },
+    progressBar: {
+      height: 10,
+      backgroundColor: "#ccc",
+      borderRadius: 5,
+    },
+    progress: {
+      height: "100%",
+      backgroundColor: "#1CB5E0",
+      borderRadius: 5,
+    },
+    mainContent: {
+      flex: 1,
+      paddingHorizontal: 10,
+    },
+    section: {
+      marginBottom: 20,
+      alignItems: "center",
+    },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 10,
+    },
+    dropArea: {
+      height: 100,
+      width: "90%",
+      backgroundColor: "#f0f0f0",
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: "#ccc",
+    },
+    dropText: {
+      color: "#777",
+      fontSize: 16,
+    },
+    materialPreview: {
+      width: 80,
+      height: 80,
+      resizeMode: "contain",
+    },
+    functionMachine: {
+      height: 150,
+      width: "90%",
+      backgroundColor: "#fff",
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: "#ccc",
+      marginBottom: 10,
+    },
+    functionQuestion: {
+      fontSize: 20,
+      fontWeight: "bold",
+      textAlign: "center",
+    },
+    playButton: {
+      alignSelf: "center",
+      backgroundColor: "#ccc",
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      borderRadius: 8,
+      width: "50%",
+      alignItems: "center",
+    },
+    playActive: {
+      backgroundColor: "#1CB5E0",
+    },
+    playButtonText: {
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 16,
+    },
+    outputContainer: {
+      height: 100,
+      width: "90%",
+      backgroundColor: "#f0f0f0",
+      borderRadius: 8,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: "#ccc",
+    },
+    outputImage: {
+      width: 80,
+      height: 80,
+    },
+    outputPlaceholder: {
+      color: "#777",
+      textAlign: "center",
+    },
+    footer: {
+      flexDirection: "column",
+      marginTop: 20,
+      paddingHorizontal: 10,
+    },
+    footerSection: {
+      marginBottom: 20,
+      alignItems: "center",
+    },
+    footerTitle: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 10,
+    },
+    materialList: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+      paddingHorizontal: 10,
+    },
+    material: {
+      width: 60,
+      height: 60,
+      resizeMode: "contain",
+    },
+    functionInputContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      paddingHorizontal: 10,
+    },
+    baseFunction: {
+      fontSize: 18,
+      color: "#333",
+      marginRight: 10,
+    },
+    functionInput: {
+      flex: 1,
+      backgroundColor: "#fff",
+      borderRadius: 8,
+      padding: 10,
+      borderColor: "#ccc",
+      borderWidth: 1,
+    },
+    recipeImage: {
+      width: "80%",
+      height: 120,
+      resizeMode: "contain",
+      alignSelf: "center",
+    },
+  });
+  

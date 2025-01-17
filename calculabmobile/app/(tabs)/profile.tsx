@@ -15,7 +15,7 @@ export default function Profile() {
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: () => router.push("/") },
+      { text: "Logout", onPress: () => router.push("../login") },
     ]);
   };
 

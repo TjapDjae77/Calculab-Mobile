@@ -13,7 +13,7 @@ export default function TabLayout() {
         tabBarIcon: () => {
           let iconSource;
 
-          if (route.name === "Explore") {
+          if (route.name === "Learn") {
             iconSource = require("../../assets/images/bookmark.png");
           } else if (route.name === "Leaderboard") {
             iconSource = require("../../assets/images/medal.png");
@@ -29,7 +29,7 @@ export default function TabLayout() {
         headerShown: false, // Hides the header
       })}
     >
-      <Tab.Screen name="Explore" component={Explore} />
+      <Tab.Screen name="Learn" component={Explore} />
       <Tab.Screen name="Leaderboard" component={Leaderboard} />
       <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>

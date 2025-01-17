@@ -25,7 +25,7 @@ export default function Leaderboard() {
   return (
     <View style={styles.container}>
       {/* Sidebar */}
-      <View style={styles.sidebar}>
+      {/* <View style={styles.sidebar}>
         <Image
           source={require("../../assets/images/Logo_Calculab.png")}
           style={styles.logo}
@@ -54,7 +54,7 @@ export default function Leaderboard() {
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
 
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.mainContent}>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   navItemActive: { backgroundColor: "#D8D8F6", borderRadius: 8 },
   navIcon: { width: 20, height: 20, marginRight: 10 },
   navText: { color: "#fff", fontSize: 16 },
-  mainContent: { width: "75%", alignItems: "center", paddingVertical: 20 },
+  mainContent: { width: "100%", alignItems: "center", paddingVertical: 20 },
   title: { fontSize: 28, fontWeight: "bold", color: "#6D2476", marginBottom: 20 },
   topThree: { flexDirection: "row", justifyContent: "space-around", width: "100%" },
   playerContainer: { alignItems: "center", marginHorizontal: 10 },

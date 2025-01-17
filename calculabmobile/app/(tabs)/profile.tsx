@@ -22,7 +22,7 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       {/* Sidebar */}
-      <View style={styles.sidebar}>
+      {/* <View style={styles.sidebar}>
         <Image
           source={require("../../assets/images/Logo_Calculab.png")}
           style={styles.logo}
@@ -57,7 +57,7 @@ export default function Profile() {
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
 
       {/* Main Content */}
       <View style={styles.mainContent}>

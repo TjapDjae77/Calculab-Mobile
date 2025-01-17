@@ -19,15 +19,15 @@ export default function Explore() {
   return (
     <View style={styles.container}>
       {/* Sidebar */}
-      <View style={styles.sidebar}>
+      {/* <View style={styles.sidebar}>
         <Image
           source={require("../../assets/images/Logo_Calculab.png")}
           style={styles.logo}
         />
-        <Text style={styles.appTitle}>Calculab</Text>
+        <Text style={styles.appTitle}>Calculab</Text> */}
 
         {/* Navigation */}
-        <View style={styles.navItems}>
+        {/* <View style={styles.navItems}>
           <TouchableOpacity style={styles.navItemActive}>
             <Image
               source={require("../../assets/images/bookmark.png")}
@@ -50,7 +50,7 @@ export default function Explore() {
             <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
 
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.mainContent}>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   mainContent: {
-    width: "75%",
+    width: "100%",
     alignItems: "center",
     paddingTop: 20,
   },

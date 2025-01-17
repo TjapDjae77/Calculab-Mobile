@@ -1,8 +1,8 @@
+import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
 
 const { width, height } = Dimensions.get('window');
 
@@ -53,7 +53,7 @@ export default function Home() {
           />
         </View>
 
-        {/* Features Sections */}
+        {/* Features Section */}
         <View style={styles.featureSection}>
           <View style={styles.featureContent}>
             <Text style={styles.featureTitle}>Attractive. Interactive. Effective.</Text>
@@ -68,8 +68,6 @@ export default function Home() {
             style={styles.featureImage}
           />
         </View>
-
-        {/* Additional sections follow the same pattern... */}
 
         {/* Footer */}
         <View style={styles.footer}>

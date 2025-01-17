@@ -1,30 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { COLORS, FONTS, SIZES } from '../constants/theme';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigation = useNavigation();
   const router = useRouter();
 
   const handleLogin = () => {
     // Implement login logic here
     console.log('Login attempted');
-  };
-
-  const handleRegister = () => {
-    router.push('/register');
+    // If login is successful, navigate to the roadmap
+    router.push('/roadmap');
   };
 
   return (
     <ScrollView style={styles.container}>
       <LinearGradient
-        colors={[COLORS.primary, COLORS.secondary]}
+        colors={['#60A5FA', '#dc1f84']}
         style={styles.backgroundImage}
       >
         <View style={styles.overlay} />
@@ -79,9 +74,11 @@ export default function Login() {
         </TouchableOpacity>
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>Don't have an account? </Text>
-          <TouchableOpacity onPress={handleRegister}>
-            <Text style={styles.signupLink}>Sign up</Text>
-          </TouchableOpacity>
+          <Link href="/register" asChild>
+            <TouchableOpacity>
+              <Text style={styles.signupLink}>Sign up</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
         <View style={styles.orContainer}>
           <View style={styles.orLine} />
@@ -105,15 +102,15 @@ export default function Login() {
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: '#FFFFFF',
   },
   backgroundImage: {
-    height: SIZES.height * 0.4,
+    height: 300,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -122,50 +119,50 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   contentLeft: {
-    padding: SIZES.padding,
+    padding: 20,
     alignItems: 'center',
   },
   logo: {
     width: 60,
     height: 60,
-    marginBottom: SIZES.base,
+    marginBottom: 10,
   },
   title: {
-    fontSize: SIZES.extraLarge,
-    fontFamily: FONTS.bold,
-    color: COLORS.white,
+    fontSize: 24,
+    fontFamily: 'Inter-Bold',
+    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: SIZES.base,
+    marginBottom: 10,
   },
   description: {
-    fontSize: SIZES.font,
-    fontFamily: FONTS.regular,
-    color: COLORS.white,
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#FFFFFF',
     textAlign: 'center',
   },
   formContainer: {
     flex: 1,
-    padding: SIZES.padding,
+    padding: 20,
   },
   formTitle: {
-    fontSize: SIZES.extraLarge,
-    fontFamily: FONTS.bold,
-    marginBottom: SIZES.base * 2,
+    fontSize: 24,
+    fontFamily: 'Inter-Bold',
+    marginBottom: 20,
   },
   inputContainer: {
-    marginBottom: SIZES.base,
+    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: SIZES.base,
-    padding: SIZES.base,
-    fontFamily: FONTS.regular,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    padding: 10,
+    fontFamily: 'Inter-Regular',
   },
   togglePassword: {
     position: 'absolute',
-    right: SIZES.base,
-    top: SIZES.base,
+    right: 10,
+    top: 10,
   },
   toggleIcon: {
     width: 24,
@@ -173,72 +170,71 @@ const styles = StyleSheet.create({
   },
   forgotPassword: {
     alignSelf: 'flex-end',
-    marginBottom: SIZES.base,
+    marginBottom: 10,
   },
   forgotPasswordText: {
-    color: COLORS.primary,
-    fontFamily: FONTS.regular,
+    color: '#60A5FA',
+    fontFamily: 'Inter-Regular',
   },
   button: {
-    backgroundColor: COLORS.primary,
-    padding: SIZES.base,
-    borderRadius: SIZES.base,
+    backgroundColor: '#60A5FA',
+    padding: 10,
+    borderRadius: 8,
     alignItems: 'center',
   },
   buttonDisabled: {
-    backgroundColor: COLORS.gray,
+    backgroundColor: '#D1D5DB',
   },
   buttonText: {
-    color: COLORS.white,
-    fontFamily: FONTS.bold,
-    fontSize: SIZES.font,
+    color: '#FFFFFF',
+    fontFamily: 'Inter-Bold',
+    fontSize: 16,
   },
   signupContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: SIZES.base,
+    marginTop: 10,
   },
   signupText: {
-    fontFamily: FONTS.regular,
+    fontFamily: 'Inter-Regular',
   },
   signupLink: {
-    color: COLORS.primary,
-    fontFamily: FONTS.bold,
+    color: '#60A5FA',
+    fontFamily: 'Inter-Bold',
   },
   orContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: SIZES.base * 2,
+    marginVertical: 20,
   },
   orLine: {
     flex: 1,
     height: 1,
-    backgroundColor: COLORS.gray,
+    backgroundColor: '#D1D5DB',
   },
   orText: {
-    marginHorizontal: SIZES.base,
-    color: COLORS.gray,
-    fontFamily: FONTS.regular,
+    marginHorizontal: 10,
+    color: '#6B7280',
+    fontFamily: 'Inter-Regular',
   },
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: SIZES.base,
-    padding: SIZES.base,
-    marginBottom: SIZES.base,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
   socialIcon: {
     width: 24,
     height: 24,
-    marginRight: SIZES.base,
+    marginRight: 10,
   },
   socialButtonText: {
-    fontFamily: FONTS.regular,
-    fontSize: SIZES.font,
+    fontFamily: 'Inter-Regular',
+    fontSize: 14,
   },
 });
 
-export default Login;

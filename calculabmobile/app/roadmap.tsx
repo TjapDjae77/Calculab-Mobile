@@ -1,58 +1,126 @@
-import { View, StyleSheet, SafeAreaView, Image } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import TimelineNode from '../components/TimelineNode';
-import Footer from '../components/Footer';
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useRouter, Link } from 'expo-router';
+
+const roadmapItems = [
+  { id: 1, title: 'Level 1: Composition Function', completed: true },
+  { id: 2, title: 'Level 2: Advanced Composition Function', completed: false },
+  { id: 3, title: 'Level 3: Trigonometry Composition Function', completed: false },
+];
 
 export default function Roadmap() {
+  const router = useRouter();
+
   return (
-    <LinearGradient
-      colors={['#40E0FD', '#E5D1FA', '#9C1A8C']}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.content}>
-        {/* Timeline */}
-        <View style={styles.timeline}>
-          <TimelineNode isComingSoon />
-          <TimelineNode number={3} href="/level3" isLocked />
-          <TimelineNode number={2} href="/level2" isLocked />
-          <TimelineNode number={1} href="/level1" />
-        </View>
-
-        {/* Factory Background */}
-        <Image
-          source={require('../assets/images/factory-background.png')}
-          style={styles.factoryBackground}
-          resizeMode="contain"
-        />
-
-        {/* Footer */}
-        <Footer />
-      </SafeAreaView>
-    </LinearGradient>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backButton}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>Roadmap</Text>
+        <Link href="/profile" asChild>
+          <TouchableOpacity>
+            <Text style={styles.profileButton}>Profile</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+      <ScrollView style={styles.content}>
+        {roadmapItems.map((item, index) => (
+          <Link key={item.id} href={`/level${item.id}`} asChild>
+            <TouchableOpacity style={styles.roadmapItem}>
+              <View style={styles.levelNumberContainer}>
+                <Text style={styles.levelNumber}>{item.id}</Text>
+              </View>
+              <View style={styles.textContainer}>
+                <Text style={[styles.itemTitle, item.completed && styles.completedTitle]}>{item.title}</Text>
+                <Text style={styles.status}>{item.completed ? 'Completed' : 'Locked'}</Text>
+              </View>
+              {index < roadmapItems.length - 1 && <View style={[styles.line, item.completed && styles.completedLine]} />}
+            </TouchableOpacity>
+          </Link>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F3F4F6',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  backButton: {
+    fontSize: 16,
+    color: '#60A5FA',
+    fontFamily: 'Inter-Bold',
+  },
+  title: {
+    fontSize: 20,
+    fontFamily: 'Inter-Bold',
+    color: '#1F2937',
+  },
+  profileButton: {
+    fontSize: 16,
+    color: '#60A5FA',
+    fontFamily: 'Inter-Bold',
   },
   content: {
     flex: 1,
-    justifyContent: 'space-between',
+    padding: 20,
   },
-  timeline: {
-    flex: 1,
+  roadmapItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  levelNumberContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#60A5FA',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 40,
-    paddingBottom: 120, // Space for factory background
+    marginRight: 15,
   },
-  factoryBackground: {
+  levelNumber: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontFamily: 'Inter-Bold',
+  },
+  line: {
     position: 'absolute',
-    bottom: 60, // Space for footer
-    left: 0,
-    right: 0,
-    height: 150,
-    width: '100%',
+    left: 20,
+    top: 40,
+    width: 2,
+    height: 40,
+    backgroundColor: '#D1D5DB',
+  },
+  completedLine: {
+    backgroundColor: '#60A5FA',
+  },
+  textContainer: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontFamily: 'Inter-Medium',
+    color: '#1F2937',
+    marginBottom: 5,
+  },
+  completedTitle: {
+    color: '#60A5FA',
+  },
+  status: {
+    fontSize: 14,
+    fontFamily: 'Inter-Regular',
+    color: '#6B7280',
   },
 });
 

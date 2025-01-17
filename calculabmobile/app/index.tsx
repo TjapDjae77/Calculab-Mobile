@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { ensureValidAccessToken, refreshAccessToken } from "../scripts/auth";
 
 const { height } = Dimensions.get("window");
 
@@ -25,13 +26,41 @@ export default function Register() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (form.password !== form.confirmPassword) {
       Alert.alert("Error", "Passwords do not match!");
       return;
     }
-    console.log("User Registered:", form);
-    router.push("/login");
+    try {
+      const response = await fetch(
+        "https://calculab-backend.up.railway.app/api/accounts/register/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: form.username,
+            email: form.email,
+            password: form.password,
+            confirm_password: form.confirmPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (data.status === "success") {
+        Alert.alert("Success", "Registration successful!");
+        router.push("/login");
+      } else {
+        const errorMessages = Object.values(data.errors)
+          .flat()
+          .join(" ");
+        Alert.alert("Error", errorMessages);
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred.");
+    }
   };
 
   return (

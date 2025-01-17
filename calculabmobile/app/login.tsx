@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height } = Dimensions.get("window");
 
@@ -22,13 +23,51 @@ export default function Login() {
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!form.usernameOrEmail || !form.password) {
       Alert.alert("Error", "Please fill in all fields!");
       return;
     }
-    console.log("User Logged In:", form);
-    router.push("/explore");
+    try {
+      const response = await fetch(
+        "https://calculab-backend.up.railway.app/api/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: form.usernameOrEmail,
+            password: form.password,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok && data.status === "success") {
+        const { token } = data.data;
+        const { refresh } = data;
+
+        if (token && refresh) {
+          await AsyncStorage.setItem("token", token);
+          await AsyncStorage.setItem("refresh_token", refresh);
+          Alert.alert("Success", "Login successful!");
+          router.push("/explore");
+        } else {
+          Alert.alert("Error", "Missing tokens in response. Please try again.");
+        }
+      } else if (data.status === "error" && data.errors) {
+        // Menggabungkan pesan error menjadi satu string
+        const errorMessages = Object.values(data.errors)
+          .flat()
+          .join(" ");
+        Alert.alert("Error", errorMessages);
+      } else {
+        Alert.alert("Error", data.message || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred.");
+    }
   };
 
   return (

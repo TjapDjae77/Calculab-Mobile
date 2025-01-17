@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,62 +6,73 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Leaderboard() {
-  const leaderboard = [
-    { id: 1, name: "User 1", score: 1200, borderColor: "#E7C464" },
-    { id: 2, name: "User 2", score: 1100, borderColor: "#C5C5C5" },
-    { id: 3, name: "User 3", score: 1050, borderColor: "#EACAAC" },
-    { id: 4, name: "User 4", score: 950, borderColor: "#00D95F" },
-    { id: 5, name: "User 5", score: 900, borderColor: "#00D95F" },
-    { id: 6, name: "User 6", score: 850, borderColor: "#00D95F" },
-    { id: 7, name: "User 7", score: 800, borderColor: "#00D95F" },
-    { id: 8, name: "User 8", score: 750, borderColor: "#00D95F" },
-    { id: 9, name: "User 9", score: 700, borderColor: "#00D95F" },
-    { id: 10, name: "User 10", score: 650, borderColor: "#00D95F" },
-  ];
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fungsi untuk memastikan token valid
+  const ensureValidAccessToken = async () => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      console.error("No token found. Redirecting to login...");
+      return null;
+    }
+    return token;
+  };
+
+  // Fungsi untuk mengambil data leaderboard
+  const fetchLeaderboard = async () => {
+    setLoading(true);
+    try {
+      const token = await ensureValidAccessToken();
+      if (!token) return;
+
+      const response = await fetch(
+        "https://calculab-backend.up.railway.app/api/leaderboard/",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 401) {
+        console.error("Unauthorized. Token might be invalid.");
+        return;
+      }
+
+      const data = await response.json();
+      if (response.ok) {
+        setLeaderboard(data);
+      } else {
+        console.error("Failed to fetch leaderboard:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Ambil data leaderboard saat halaman dimuat
+  useEffect(() => {
+    fetchLeaderboard();
+  }, []);
 
   return (
     <View style={styles.container}>
-      {/* Sidebar */}
-      {/* <View style={styles.sidebar}>
-        <Image
-          source={require("../../assets/images/Logo_Calculab.png")}
-          style={styles.logo}
-        />
-        <Text style={styles.appTitle}>Calculab</Text>
-        <View style={styles.navItems}>
-          <TouchableOpacity style={styles.navItem}>
-            <Image
-              source={require("../../assets/images/bookmark.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Learn</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.navItem, styles.navItemActive]}>
-            <Image
-              source={require("../../assets/images/medal.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Leaderboard</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Image
-              source={require("../../assets/images/profile.png")}
-              style={styles.navIcon}
-            />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-      </View> */}
-
       {/* Main Content */}
-      <ScrollView contentContainerStyle={styles.mainContent}>
-        <Text style={styles.title}>Leaderboard</Text>
+      {/* <ScrollView contentContainerStyle={styles.mainContent}>
+        <Text style={styles.title}>Leaderboard</Text> */}
 
         {/* Top 3 Players */}
-        <View style={styles.topThree}>
+        {/* <View style={styles.topThree}>
           <View style={[styles.playerContainer, styles.topPlayer, { marginTop: 40 }]}>
             <View
               style={[
@@ -108,10 +119,10 @@ export default function Leaderboard() {
             <Text style={styles.playerName}>{leaderboard[2].name}</Text>
             <Text style={styles.playerScore}>{leaderboard[2].score}</Text>
           </View>
-        </View>
+        </View> */}
 
         {/* Other Players */}
-        <View style={styles.leaderboardList}>
+        {/* <View style={styles.leaderboardList}>
           {leaderboard.slice(3).map((player) => (
             <View key={player.id} style={styles.listItem}>
               <Text style={styles.rank}>{player.id}</Text>
@@ -126,39 +137,80 @@ export default function Leaderboard() {
                   style={styles.avatarImage}
                 />
               </View>
-              <Text style={styles.playerName}>{player.name}</Text>
+              <Text style={styles.playerName}>{player.username}</Text>
               <Text style={styles.playerScore}>{player.score}</Text>
             </View>
           ))}
         </View>
-      </ScrollView>
+      </ScrollView> */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#6D2476" />
+      ) : (
+        <ScrollView contentContainerStyle={styles.mainContent}>
+          <Text style={styles.title}>Leaderboard</Text>
+
+          {/* Top 3 Players */}
+          <View style={styles.topThree}>
+            {leaderboard.slice(0, 3).map((player, index) => (
+              <View
+                key={player.id || index} // Atribut key tetap untuk menghindari peringatan React
+                style={[
+                  styles.playerContainer,
+                  index === 0
+                    ? { order: 2 }
+                    : index === 1
+                    ? { order: 1 }
+                    : { order: 3 }, // Urutan berdasarkan indeks
+                ]}
+              >
+                <View
+                  style={[
+                    styles.avatar,
+                    index === 0
+                      ? [styles.largeAvatar, { borderColor: "#E7C464" }]
+                      : index === 1
+                      ? { borderColor: "#C5C5C5" }
+                      : { borderColor: "#EACAAC" },
+                  ]}
+                >
+                  <Image
+                    source={require("../../assets/images/User_Icon.png")}
+                    style={styles.avatarImage}
+                  />
+                </View>
+                <Text style={styles.playerName}>{player.name || "Anonymous"}</Text>
+                <Text style={styles.playerScore}>{player.score || 0}</Text>
+              </View>
+            ))}
+          </View>
+
+          {/* Other Players */}
+          <View style={styles.leaderboardList}>
+            {leaderboard.slice(3).map((player, index) => (
+              <View key={player.id || index + 3} style={styles.listItem}>
+                <Text style={styles.rank}>{index + 4}</Text>
+                <View style={[styles.avatar, { borderColor: "#00D95F" }]}>
+                  <Image
+                    source={require("../../assets/images/User_Icon.png")}
+                    style={styles.avatarImage}
+                  />
+                </View>
+                <Text style={styles.playerName}>{player.name || "Anonymous"}</Text>
+                <Text style={styles.playerScore}>{player.score || 0}</Text>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: "row", backgroundColor: "#E2E8F0" },
-  sidebar: {
-    width: "25%",
-    backgroundColor: "#6D2476",
-    alignItems: "center",
-    paddingVertical: 20,
-  },
-  logo: { width: 50, height: 50, marginBottom: 20 },
-  appTitle: { fontSize: 24, color: "#fff", fontWeight: "bold", marginBottom: 40 },
-  navItems: { width: "100%", alignItems: "center" },
-  navItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-    marginBottom: 20,
-  },
-  navItemActive: { backgroundColor: "#D8D8F6", borderRadius: 8 },
-  navIcon: { width: 20, height: 20, marginRight: 10 },
-  navText: { color: "#fff", fontSize: 16 },
+  container: { flex: 1, backgroundColor: "#E2E8F0" },
   mainContent: { width: "100%", alignItems: "center", paddingVertical: 20 },
   title: { fontSize: 28, fontWeight: "bold", color: "#6D2476", marginBottom: 20 },
-  topThree: { flexDirection: "row", justifyContent: "space-around", width: "100%" },
+  topThree: { flexDirection: "row", justifyContent: "center", alignItems:"flex-end", width: "100%" },
   playerContainer: { alignItems: "center", marginHorizontal: 10 },
   firstPlayer: { marginTop: -20 },
   topPlayer: { marginTop: 20 },
@@ -171,7 +223,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#fff",
   },
-  largeAvatar: { width: 80, height: 80, borderRadius: 40 },
+  largeAvatar: { width: 80, height: 80, borderRadius: 40, borderWidth: 4 },
   avatarImage: { width: "60%", height: "60%" },
   playerName: { fontSize: 16, fontWeight: "bold", marginTop: 8 },
   playerScore: { fontSize: 14, color: "#333" },

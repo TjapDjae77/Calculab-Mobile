@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,53 +10,201 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type Question = {
+  id: number;
+  level: number;
+  premise1: string;
+  premise2: string;
+  input_function_checker: string[];
+  material_input_checker: string;
+  output_material: string;
+  base_function: string;
+};
 
 export default function Level1() {
   const router = useRouter();
   const [inputFunction, setInputFunction] = useState("");
   const [progress, setProgress] = useState(0);
   const [lives, setLives] = useState(3);
-  const [outputImage, setOutputImage] = useState(require("../assets/images/Conehead.png")); // Initial output image
-  const [selectedMaterial, setSelectedMaterial] = useState(null); // Track selected material
+  const [outputImage, setOutputImage] = useState<any>(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [baseFunction, setBaseFunction] = useState("");
 
-  const handlePlay = () => {
-    if (!selectedMaterial) {
-      Alert.alert("Error", "Please select a material!");
-      return;
-    }
-    if (inputFunction.trim() === "") {
-      Alert.alert("Error", "Please input a function!");
-      return;
-    }
+  const imageMap: Record<string, any> = {
+    aluminium: require("../assets/images/aluminium.png"),
+    anvil: require("../assets/images/anvil.png"),
+    Body_Rocket: require("../assets/images/Body_Rocket.png"),
+    Conehead: require("../assets/images/Conehead.png"),
+    fiberglass: require("../assets/images/fiberglass.png"),
+    glass: require("../assets/images/glass.png"),
+    Feet_Rocket: require("../assets/images/Feet_Rocket.png"),
+    Mirror: require("../assets/images/Mirror.png"),
+  };
 
-    // Correct answer scenario
-    if (
-      inputFunction === "f(x)=x^2" &&
-      selectedMaterial === require("../assets/images/fiberglass.png")
-    ) {
-      setProgress((prev) => {
-        const newProgress = Math.min(prev + 33, 100);
-        if (newProgress === 100) {
-          Alert.alert("Congratulations!", "You have completed the level!", [
-            { text: "Continue", onPress: () => router.push("/explore") },
-          ]);
-        }
-        return newProgress;
-      });
-      setOutputImage(require("../assets/images/Conehead.png")); // Update output to Conehead for this context
+  const shuffleArray = (array: Question[]): Question[] => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
+  const loadQuestion = (question: Question) => {
+    const materialImage = imageMap[question.output_material as keyof typeof imageMap];
+    if (materialImage) {
+      setOutputImage(materialImage); // Set image using the map
     } else {
-      // Incorrect answer scenario
-      setLives((prev) => {
-        const newLives = Math.max(prev - 1, 0);
-        if (newLives === 0) {
-          Alert.alert("Game Over", "You have lost all your lives.", [
-            { text: "Retry", onPress: () => router.push("/explore") },
-          ]);
-        }
-        return newLives;
-      });
+      console.error(`Image for ${question.output_material} not found`);
+    }
+    setBaseFunction(`${question.base_function} =`);
+    setInputFunction("");
+    setSelectedMaterial(null);
+  };
+
+  const validateAnswer = () => {
+    const currentQuestion = questions[currentQuestionIndex];
+    
+    if (!currentQuestion) return;
+
+    // Check correctness
+    const isFunctionCorrect = currentQuestion.input_function_checker.includes(inputFunction.trim());
+    const isMaterialCorrect =
+    selectedMaterial === imageMap[currentQuestion.material_input_checker as keyof typeof imageMap];
+
+    if (isFunctionCorrect && isMaterialCorrect) {
+      const nextIndex = currentQuestionIndex + 1;
+  
+      // Update progress
+      setProgress((prev) => Math.min(prev + 33, 100));
+  
+      if (nextIndex < questions.length) {
+        // Load next question
+        setCurrentQuestionIndex(nextIndex);
+        loadQuestion(questions[nextIndex]);
+      } else {
+        const finalScore = lives * 100;
+        updateProgressOnServer(2, finalScore);
+
+        // Complete level
+        Alert.alert("Congratulations!", `You completed the level with a score of ${finalScore}!`, [
+          { text: "Continue", onPress: () => router.push("/explore") },
+        ]);
+      }
+    } else {
+      // Wrong answer
+      handleWrongAnswer();
     }
   };
+
+  const updateProgressOnServer = async (level_number: number, score: number) => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+  
+    fetch(`https://calculab-backend.up.railway.app/api/levels/complete/${level_number}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ score }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update progress");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Progress updated successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating progress:", error);
+      });
+  };
+  
+  const handleWrongAnswer = () => {
+    setLives((prev) => {
+      const newLives = Math.max(prev - 1, 0);
+      if (newLives === 0) {
+        Alert.alert("Game Over", "You have lost all your lives.", [
+          { text: "Retry", onPress: () => router.push("/explore") },
+        ]);
+      }
+      return newLives;
+    });
+  };
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(
+          "https://calculab-backend.up.railway.app/api/questions/"
+        );
+        const data: Question[] = await response.json();
+        const level2Questions = data.filter((q) => q.level === 2);
+
+        // Shuffle and set questions
+        const shuffledQuestions = shuffleArray(level2Questions).slice(0, 3);
+        setQuestions(shuffledQuestions);
+
+        // Set the first question
+        if (shuffledQuestions.length > 0) {
+          loadQuestion(shuffledQuestions[0]);
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load questions.");
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+
+  // const handlePlay = () => {
+  //   if (!selectedMaterial) {
+  //     Alert.alert("Error", "Please select a material!");
+  //     return;
+  //   }
+  //   if (inputFunction.trim() === "") {
+  //     Alert.alert("Error", "Please input a function!");
+  //     return;
+  //   }
+
+  //   // Correct answer scenario
+  //   if (
+  //     inputFunction === "f(x)=x^2" &&
+  //     selectedMaterial === require("../assets/images/fiberglass.png")
+  //   ) {
+  //     setProgress((prev) => {
+  //       const newProgress = Math.min(prev + 33, 100);
+  //       if (newProgress === 100) {
+  //         Alert.alert("Congratulations!", "You have completed the level!", [
+  //           { text: "Continue", onPress: () => router.push("/explore") },
+  //         ]);
+  //       }
+  //       return newProgress;
+  //     });
+  //     setOutputImage(require("../assets/images/Conehead.png")); // Update output to Conehead for this context
+  //   } else {
+  //     // Incorrect answer scenario
+  //     setLives((prev) => {
+  //       const newLives = Math.max(prev - 1, 0);
+  //       if (newLives === 0) {
+  //         Alert.alert("Game Over", "You have lost all your lives.", [
+  //           { text: "Retry", onPress: () => router.push("/explore") },
+  //         ]);
+  //       }
+  //       return newLives;
+  //     });
+  //   }
+  // };
 
   const goBackHandler = () => {
     Alert.alert(
@@ -111,7 +259,7 @@ export default function Level1() {
             {selectedMaterial ? (
               <Image source={selectedMaterial} style={styles.materialPreview} />
             ) : (
-              <Text style={styles.dropText}>Drop the material here</Text>
+              <Text style={styles.dropText}>Click material on list materials</Text>
             )}
           </View>
         </View>
@@ -120,7 +268,13 @@ export default function Level1() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Function Machine</Text>
           <View style={styles.functionMachine}>
-            <Text style={styles.functionQuestion}>f(x) = ?</Text>
+            {questions[currentQuestionIndex] ? (
+              <Text style={styles.functionQuestion}>
+                {`${questions[currentQuestionIndex].premise1}\n\n${questions[currentQuestionIndex].premise2}`}
+              </Text>
+            ) : (
+              <Text style={styles.functionQuestion}>Loading...</Text>
+            )}
           </View>
         </View>
 
@@ -192,7 +346,7 @@ export default function Level1() {
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>Input Function</Text>
           <View style={styles.functionInputContainer}>
-            <Text style={styles.baseFunction}>f(x) =</Text>
+          <Text style={styles.baseFunction}>{baseFunction}</Text>
             <TextInput
               value={inputFunction}
               onChangeText={setInputFunction}
@@ -208,7 +362,7 @@ export default function Level1() {
             styles.playButton,
             inputFunction && selectedMaterial ? styles.playActive : {},
           ]}
-          onPress={handlePlay}
+          onPress={validateAnswer}
           disabled={!inputFunction || !selectedMaterial}
         >
           <Text style={styles.playButtonText}>Play</Text>

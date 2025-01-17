@@ -2,10 +2,11 @@ import { Stack } from 'expo-router';
 import { useCallback } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { View } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function Layout() {
+export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
@@ -21,12 +22,12 @@ export default function Layout() {
   if (!fontsLoaded) return null;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: 'transparent' },
-      }}
-    />
+    <View onLayout={onLayoutRootView}>
+      <Stack 
+        screenOptions={{ 
+          headerShown: false 
+        }}
+      />
+    </View>
   );
 }
-

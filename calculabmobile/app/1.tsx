@@ -16,25 +16,45 @@ export default function Level1() {
   const [inputFunction, setInputFunction] = useState("");
   const [progress, setProgress] = useState(0);
   const [lives, setLives] = useState(3);
-  const [outputImage, setOutputImage] = useState(null);
+  const [outputImage, setOutputImage] = useState(require("../assets/images/Conehead.png")); // Initial output image
   const [selectedMaterial, setSelectedMaterial] = useState(null); // Track selected material
 
   const handlePlay = () => {
+    if (!selectedMaterial) {
+      Alert.alert("Error", "Please select a material!");
+      return;
+    }
     if (inputFunction.trim() === "") {
       Alert.alert("Error", "Please input a function!");
       return;
     }
 
-    // Mock success scenario: Increment progress
-    if (inputFunction === "f(x)=x^2") {
-      setProgress((prev) => Math.min(prev + 33, 100)); // Example increment
-      setOutputImage(require("../assets/images/Conehead.png")); // Update output
+    // Correct answer scenario
+    if (
+      inputFunction === "f(x)=x^2" &&
+      selectedMaterial === require("../assets/images/fiberglass.png")
+    ) {
+      setProgress((prev) => {
+        const newProgress = Math.min(prev + 33, 100);
+        if (newProgress === 100) {
+          Alert.alert("Congratulations!", "You have completed the level!", [
+            { text: "Continue", onPress: () => router.push("/explore") },
+          ]);
+        }
+        return newProgress;
+      });
+      setOutputImage(require("../assets/images/Conehead.png")); // Update output to Conehead for this context
     } else {
-      setLives((prev) => Math.max(prev - 1, 0));
-      if (lives === 1) {
-        Alert.alert("Game Over", "You have lost all your lives.");
-        router.push("/explore"); // Navigate back to the explore page
-      }
+      // Incorrect answer scenario
+      setLives((prev) => {
+        const newLives = Math.max(prev - 1, 0);
+        if (newLives === 0) {
+          Alert.alert("Game Over", "You have lost all your lives.", [
+            { text: "Retry", onPress: () => router.push("/explore") },
+          ]);
+        }
+        return newLives;
+      });
     }
   };
 
@@ -61,10 +81,14 @@ export default function Level1() {
         </TouchableOpacity>
         <Text style={styles.levelTitle}>Level 1 - Composition Function</Text>
         <View style={styles.livesContainer}>
-          {[...Array(lives)].map((_, index) => (
+          {[...Array(3)].map((_, index) => (
             <Image
               key={index}
-              source={require("../assets/images/Full_Heart.png")}
+              source={
+                index < lives
+                  ? require("../assets/images/Full_Heart.png")
+                  : require("../assets/images/Empty_Heart.png")
+              }
               style={styles.lifeIcon}
             />
           ))}
@@ -85,10 +109,7 @@ export default function Level1() {
           <Text style={styles.sectionTitle}>Material Input</Text>
           <View style={styles.dropArea}>
             {selectedMaterial ? (
-              <Image
-                source={selectedMaterial}
-                style={styles.materialPreview}
-              />
+              <Image source={selectedMaterial} style={styles.materialPreview} />
             ) : (
               <Text style={styles.dropText}>Drop the material here</Text>
             )}
@@ -101,13 +122,6 @@ export default function Level1() {
           <View style={styles.functionMachine}>
             <Text style={styles.functionQuestion}>f(x) = ?</Text>
           </View>
-          <TouchableOpacity
-            style={[styles.playButton, inputFunction ? styles.playActive : {}]}
-            onPress={handlePlay}
-            disabled={!inputFunction}
-          >
-            <Text style={styles.playButtonText}>Play</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Output Component */}
@@ -188,6 +202,18 @@ export default function Level1() {
           </View>
         </View>
 
+        {/* Play Button */}
+        <TouchableOpacity
+          style={[
+            styles.playButton,
+            inputFunction && selectedMaterial ? styles.playActive : {},
+          ]}
+          onPress={handlePlay}
+          disabled={!inputFunction || !selectedMaterial}
+        >
+          <Text style={styles.playButtonText}>Play</Text>
+        </TouchableOpacity>
+
         {/* Recipe */}
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>Recipe</Text>
@@ -201,6 +227,8 @@ export default function Level1() {
   );
 }
 
+
+
 const styles = StyleSheet.create({
     container: {
       flexGrow: 1,
@@ -213,14 +241,14 @@ const styles = StyleSheet.create({
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: 10,
-      marginBottom: 20,
+      marginBottom: 10,
     },
     backIcon: {
       width: 40,
       height: 40,
     },
     levelTitle: {
-      fontSize: 20,
+      fontSize: 18,
       fontWeight: "bold",
       color: "#000",
       flex: 1,
@@ -235,7 +263,7 @@ const styles = StyleSheet.create({
       marginLeft: 5,
     },
     progressBarContainer: {
-      width: "90%",
+      width: "80%",
       alignSelf: "center",
       marginBottom: 20,
     },
@@ -255,7 +283,6 @@ const styles = StyleSheet.create({
     },
     section: {
       marginBottom: 20,
-      alignItems: "center",
     },
     sectionTitle: {
       fontSize: 18,
@@ -265,7 +292,6 @@ const styles = StyleSheet.create({
     },
     dropArea: {
       height: 100,
-      width: "90%",
       backgroundColor: "#f0f0f0",
       borderRadius: 8,
       justifyContent: "center",
@@ -278,25 +304,29 @@ const styles = StyleSheet.create({
       fontSize: 16,
     },
     materialPreview: {
-      width: 80,
-      height: 80,
+      width: 60,
+      height: 60,
       resizeMode: "contain",
     },
     functionMachine: {
       height: 150,
-      width: "90%",
       backgroundColor: "#fff",
       borderRadius: 8,
       justifyContent: "center",
       alignItems: "center",
+      marginBottom: 10,
       borderWidth: 2,
       borderColor: "#ccc",
-      marginBottom: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 5,
     },
     functionQuestion: {
       fontSize: 20,
       fontWeight: "bold",
-      textAlign: "center",
+      color: "#000",
     },
     playButton: {
       alignSelf: "center",
@@ -304,8 +334,6 @@ const styles = StyleSheet.create({
       paddingVertical: 10,
       paddingHorizontal: 20,
       borderRadius: 8,
-      width: "50%",
-      alignItems: "center",
     },
     playActive: {
       backgroundColor: "#1CB5E0",
@@ -313,11 +341,9 @@ const styles = StyleSheet.create({
     playButtonText: {
       color: "#fff",
       fontWeight: "bold",
-      fontSize: 16,
     },
     outputContainer: {
       height: 100,
-      width: "90%",
       backgroundColor: "#f0f0f0",
       borderRadius: 8,
       justifyContent: "center",
@@ -326,21 +352,20 @@ const styles = StyleSheet.create({
       borderColor: "#ccc",
     },
     outputImage: {
-      width: 80,
-      height: 80,
+      width: 60,
+      height: 60,
+      resizeMode: "contain",
     },
     outputPlaceholder: {
       color: "#777",
-      textAlign: "center",
+      fontSize: 16,
     },
     footer: {
       flexDirection: "column",
       marginTop: 20,
-      paddingHorizontal: 10,
     },
     footerSection: {
       marginBottom: 20,
-      alignItems: "center",
     },
     footerTitle: {
       fontSize: 18,
@@ -350,25 +375,25 @@ const styles = StyleSheet.create({
     },
     materialList: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      width: "100%",
-      paddingHorizontal: 10,
+      justifyContent: "space-around",
     },
     material: {
       width: 60,
       height: 60,
       resizeMode: "contain",
+      borderWidth: 2,
+      borderColor: "#ccc",
+      borderRadius: 8,
+      backgroundColor: "#f0f0f0",
     },
     functionInputContainer: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      width: "100%",
-      paddingHorizontal: 10,
     },
     baseFunction: {
       fontSize: 18,
-      color: "#333",
+      color: "#000",
       marginRight: 10,
     },
     functionInput: {
@@ -380,10 +405,9 @@ const styles = StyleSheet.create({
       borderWidth: 1,
     },
     recipeImage: {
-      width: "80%",
+      width: "100%",
       height: 120,
       resizeMode: "contain",
-      alignSelf: "center",
     },
   });
   

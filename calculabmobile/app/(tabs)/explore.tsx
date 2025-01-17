@@ -50,8 +50,6 @@ export default function Explore() {
           ? data.completed_levels.length
           : 0;
 
-        console.log('Completed Level Count:', completedLevelsCount)
-
         // Mengatur status level berdasarkan jumlah level yang diselesaikan
         const levelData = [
           { id: 4, label: "Coming soon. Stay tuned!", active: false },

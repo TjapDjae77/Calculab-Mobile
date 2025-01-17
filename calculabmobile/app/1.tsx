@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Question = {
   id: number;
@@ -31,6 +32,7 @@ export default function Level1() {
   const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [baseFunction, setBaseFunction] = useState("");
 
   const imageMap: Record<string, any> = {
     aluminium: require("../assets/images/aluminium.png"),
@@ -58,6 +60,7 @@ export default function Level1() {
     } else {
       console.error(`Image for ${question.output_material} not found`);
     }
+    setBaseFunction(`${question.base_function} =`);
     setInputFunction("");
     setSelectedMaterial(null);
   };
@@ -83,8 +86,11 @@ export default function Level1() {
         setCurrentQuestionIndex(nextIndex);
         loadQuestion(questions[nextIndex]);
       } else {
+        const finalScore = lives * 100;
+        updateProgressOnServer(1, finalScore);
+
         // Complete level
-        Alert.alert("Congratulations!", "You completed the level!", [
+        Alert.alert("Congratulations!", `You completed the level with a score of ${finalScore}!`, [
           { text: "Continue", onPress: () => router.push("/explore") },
         ]);
       }
@@ -92,6 +98,35 @@ export default function Level1() {
       // Wrong answer
       handleWrongAnswer();
     }
+  };
+
+  const updateProgressOnServer = async (level_number: number, score: number) => {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      console.error("No access token found");
+      return;
+    }
+  
+    fetch(`https://calculab-backend.up.railway.app/api/levels/complete/${level_number}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ score }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to update progress");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Progress updated successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error updating progress:", error);
+      });
   };
   
   const handleWrongAnswer = () => {
@@ -124,7 +159,6 @@ export default function Level1() {
           loadQuestion(shuffledQuestions[0]);
         }
       } catch (error) {
-        console.error("Error fetching questions:", error);
         Alert.alert("Error", "Failed to load questions.");
       }
     };
@@ -312,7 +346,7 @@ export default function Level1() {
         <View style={styles.footerSection}>
           <Text style={styles.footerTitle}>Input Function</Text>
           <View style={styles.functionInputContainer}>
-            <Text style={styles.baseFunction}>f(x) =</Text>
+          <Text style={styles.baseFunction}>{baseFunction}</Text>
             <TextInput
               value={inputFunction}
               onChangeText={setInputFunction}

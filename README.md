@@ -1,8 +1,5 @@
 ---
 
-### README.md (For Mobile Repository)
-
-```markdown
 # 📱 Calculab Mobile: Virtual Lab for Calculus 🚀
 
 Welcome to the **Calculab Mobile** repository, part of the Calculab ecosystem. This React Native-based mobile app brings calculus learning to your fingertips, combining convenience with gamified challenges to master mathematical concepts on the go.
